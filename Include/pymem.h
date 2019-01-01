@@ -53,6 +53,17 @@ PyAPI_FUNC(void *) PyMem_Malloc(size_t);
 PyAPI_FUNC(void *) PyMem_Realloc(void *, size_t);
 PyAPI_FUNC(void) PyMem_Free(void *);
 
+#ifdef REDIS_ALLOC
+extern void *(*Redis_Alloc)(size_t bytes);
+extern void *(*Redis_Realloc)(void *ptr, size_t bytes);
+extern void (*Redis_Free)(void *ptr);
+
+#define PyMem_MALLOC(n)		((size_t)(n) > (size_t)PY_SSIZE_T_MAX ? NULL \
+				: Redis_Alloc(((n) != 0) ? (n) : 1))
+#define PyMem_REALLOC(p, n)	((size_t)(n) > (size_t)PY_SSIZE_T_MAX  ? NULL \
+				: Redis_Realloc((p), ((n) != 0) ? (n) : 1))
+#define PyMem_FREE		Redis_Free
+#else
 /* Starting from Python 1.6, the wrappers Py_{Malloc,Realloc,Free} are
    no longer supported. They used to call PyErr_NoMemory() on failure. */
 
@@ -78,6 +89,8 @@ PyAPI_FUNC(void) PyMem_Free(void *);
 #define PyMem_FREE		free
 
 #endif	/* PYMALLOC_DEBUG */
+
+#endif
 
 /*
  * Type-oriented memory interface

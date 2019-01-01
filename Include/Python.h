@@ -178,4 +178,10 @@ PyAPI_FUNC(PyObject*) _Py_Mangle(PyObject *p, PyObject *name);
 #define PyDoc_STR(str) ""
 #endif
 
+#ifdef REDIS_ALLOC
+void Py_SetAllocFunction(void *(*alloc)(size_t));
+void Py_SetReallocFunction(void *(*realloc)(void *, size_t));
+void Py_SetFreeFunction(void (*free)(void *));
+#endif
+
 #endif /* !Py_PYTHON_H */

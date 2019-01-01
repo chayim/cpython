@@ -1216,7 +1216,7 @@
 #undef _POSIX_1_SOURCE
 
 /* Define to activate features from IEEE Stds 1003.1-2001 */
-#undef _POSIX_C_SOURCE
+/* #undef _POSIX_C_SOURCE */
 
 /* Define to 1 if you need to in order for `stat' and other things to work. */
 #undef _POSIX_SOURCE

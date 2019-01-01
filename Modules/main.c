@@ -239,6 +239,23 @@ static int RunMainFromImporter(char *filename)
 
 
 /* Main program */
+#ifdef REDIS_ALLOC
+void *(*Redis_Alloc)(size_t bytes) = NULL;
+void *(*Redis_Realloc)(void *ptr, size_t bytes) = NULL;
+void (*Redis_Free)(void *ptr) = NULL;
+
+void Py_SetAllocFunction(void *(*alloc)(size_t)){
+	Redis_Alloc = alloc;
+}
+
+void Py_SetReallocFunction(void *(*realloc)(void*, size_t)){
+	Redis_Realloc = realloc;
+}
+
+void Py_SetFreeFunction(void (*free)(void*)){
+	Redis_Free = free;
+}
+#endif
 
 int
 Py_Main(int argc, char **argv)
@@ -257,6 +274,12 @@ Py_Main(int argc, char **argv)
     int version = 0;
     int saw_unbuffered_flag = 0;
     PyCompilerFlags cf;
+
+#ifdef REDIS_ALLOC
+    Redis_Alloc = malloc;
+    Redis_Realloc = realloc;
+    Redis_Free = free;
+#endif
 
     cf.cf_flags = 0;
 
