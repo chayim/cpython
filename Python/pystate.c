@@ -1031,8 +1031,13 @@ PyGILState_Check(void)
     return (tstate == PyGILState_GetThisThreadState());
 }
 
+#ifndef FEATURE_1
+PyGILState_STATE
+_PyGILState_Ensure(void)
+#else
 PyGILState_STATE
 PyGILState_Ensure(void)
+#endif // FEATURE_1
 {
     int current;
     PyThreadState *tcur;
@@ -1084,8 +1089,21 @@ PyGILState_Ensure(void)
     return current ? PyGILState_LOCKED : PyGILState_UNLOCKED;
 }
 
+#ifndef FEATURE_1
+PyGILState_STATE
+PyGILState_Ensure(void)
+{
+    return _PyGILState_Ensure();
+}
+#endif // FEATURE_1
+
+#ifndef FEATURE_1
+void
+_PyGILState_Release(PyGILState_STATE oldstate)
+#else
 void
 PyGILState_Release(PyGILState_STATE oldstate)
+#endif // FEATURE_1
 {
     PyThreadState *tcur = (PyThreadState *)PyThread_tss_get(
                                 &_PyRuntime.gilstate.autoTSSkey);
@@ -1122,6 +1140,13 @@ PyGILState_Release(PyGILState_STATE oldstate)
         PyEval_SaveThread();
 }
 
+#ifndef FEATURE_1
+void
+PyGILState_Release(PyGILState_STATE oldstate)
+{
+    return _PyGILState_Release(oldstate);
+}
+#endif // FEATURE_1
 
 #ifdef __cplusplus
 }
